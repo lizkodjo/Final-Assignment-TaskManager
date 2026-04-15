@@ -10,8 +10,8 @@ async function fetchTasks() {
     const tasks = await response.json();
     displayTasks(tasks);
   } catch (error) {
-    console.error("Error fetching tasks: ", error);
-    showError("Failed to load tasks.  Please refresh the page.");
+    console.error("Error fetching tasks:", error);
+    showError("Failed to load tasks. Please refresh the page.");
   }
 }
 
@@ -25,32 +25,30 @@ function displayTasks(tasks) {
 
   if (filteredTasks.length === 0) {
     tasksList.innerHTML =
-      '<div class="no-tasks">No tasks found.  Add a new task!</div>';
+      '<div class="no-tasks">No tasks found. Add a new task!</div>';
     return;
   }
 
   tasksList.innerHTML = filteredTasks
     .map(
       (task) => `
-    <div class="task-card ${task.priority} ${task.status === "completed" ? "completed" : ""}" data-id="${task._id}">
-    <div class="task-header">
-    <h3>${escapeHtml(task.title)}</h3>
-    <span class="priority-badge ${task.priority}">${task.priority}</span>
-    </div>
-    ${task.description ? `<p class="task-description">${escapeHtml(task.description)}</p>` : ""}
-    <div class="task-footer">
-    <span class="task-status ${task.status}">${task.status}</span>
-    <div class="task-actions">
-    <button onclick="toggleTask('${task._id})" class="toggle-btn">
-    ${task.status === "pending" ? "✔️ Complete" : "↺ Reopen"}
-    </button>
-    <button onclick="deleteTask('${task._id}')" class="delete-btn">🗑️ Delete
-    </button>
-    </div>
-    </div>
-    </div>
-
-    `,
+                <div class="task-card ${task.priority} ${task.status === "completed" ? "completed" : ""}" data-id="${task._id}">
+                    <div class="task-header">
+                        <h3>${escapeHtml(task.title)}</h3>
+                        <span class="priority-badge ${task.priority}">${task.priority}</span>
+                    </div>
+                    ${task.description ? `<p class="task-description">${escapeHtml(task.description)}</p>` : ""}
+                    <div class="task-footer">
+                        <span class="task-status ${task.status}">${task.status}</span>
+                        <div class="task-actions">
+                            <button onclick="toggleTask('${task._id}')" class="toggle-btn">
+                                ${task.status === "pending" ? "✓ Complete" : "↺ Reopen"}
+                            </button>
+                            <button onclick="deleteTask('${task._id}')" class="delete-btn">🗑 Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `,
     )
     .join("");
 }
@@ -83,10 +81,10 @@ document.getElementById("taskForm").addEventListener("submit", async (e) => {
     }
 
     const result = await response.json();
-    console.log("Task added: ", result);
+    console.log("Task added:", result);
 
     // Reset form and refresh tasks
-    document.getElementById("taskForm").requestFullscreen();
+    document.getElementById("taskForm").reset();
     await fetchTasks();
     showSuccess("Task added successfully!");
   } catch (error) {
@@ -116,7 +114,7 @@ async function toggleTask(taskId) {
     showSuccess("Task status updated!");
   } catch (error) {
     console.error("Error toggling task:", error);
-    showError("Failed to update task.  Please try again.");
+    showError("Failed to update task. Please try again.");
   }
 }
 
@@ -137,12 +135,12 @@ async function deleteTask(taskId) {
     }
 
     const result = await response.json();
-    console.log("Task deleted: ", result);
+    console.log("Task deleted:", result);
     await fetchTasks();
     showSuccess("Task deleted successfully!");
   } catch (error) {
-    console.error("Error deleting task: ", error);
-    showError("Failed to delete task.  Please try again.");
+    console.error("Error deleting task:", error);
+    showError("Failed to delete task. Please try again.");
   }
 }
 
@@ -165,64 +163,64 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Display error message
+// Show error message
 function showError(message) {
   const errorDiv = document.createElement("div");
   errorDiv.className = "notification error";
   errorDiv.textContent = message;
   errorDiv.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #F56565;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
-    `;
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #f56565;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
   document.body.appendChild(errorDiv);
   setTimeout(() => errorDiv.remove(), 3000);
 }
 
-// Display success message
+// Show success message
 function showSuccess(message) {
   const successDiv = document.createElement("div");
   successDiv.className = "notification success";
   successDiv.textContent = message;
   successDiv.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #48BB78;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
-    `;
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #48bb78;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
   document.body.appendChild(successDiv);
   setTimeout(() => successDiv.remove(), 3000);
 }
 
-// Animation styles
+// Add animation styles
 const style = document.createElement("style");
 style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-`;
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
 document.head.appendChild(style);
 
 // Initial fetch
 fetchTasks();
 
 // Optional: Auto-refresh every 30 seconds
-setInterval(fetchTasks, 30000);
+// setInterval(fetchTasks, 30000);
