@@ -1,5 +1,0 @@
-# Breakdown
-
-- .env
-- requirements
-- mongodb
