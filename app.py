@@ -1,5 +1,8 @@
+import atexit
 from datetime import datetime
 import os
+import signal
+import sys
 
 from bson import ObjectId
 from flask import Flask, jsonify, render_template, request
@@ -18,6 +21,45 @@ client = MongoClient(MONGO_URI)
 # Create a databse and collection
 db = client["task_manager_db"]
 tasks_collection = db["tasks"]
+
+# Global flag shutdown
+shutdown_flag = False
+
+
+def signal_handler(sig, frame):
+    """Handle shutdown signals"""
+    global shutdown_flag
+    print("\n🔴 Received shutdown signal.  Cleaning up...")
+    shutdown_flag = True
+
+    # Close MongoDB connenction
+    try:
+        client.close()
+        print("✅ MongoDB connenction closed")
+    except Exception as e:
+        print(f"⚠️ Error closing MongoDB: {e}")
+    print("👏 Server shutdown complete")
+    sys.exit(0)
+
+
+def cleanup():
+    """Cleanup function called on exit"""
+    global shutdown_flag
+    if not shutdown_flag:
+        print("\n🔴 Cleaning up...")
+        try:
+            client.close()
+            print("✅ MongoDB connection closed")
+        except Exception as e:
+            print(f"⚠️ Error closing MongoDB: {e}")
+
+
+# Register signal handlers
+signal.signal(signal.SIGINT, signal_handler)  # Ctrl+C
+signal.signal(signal.SIGTERM, signal_handler)  # Termination signal
+
+# Register cleanup on normal exit
+atexit.register(cleanup)
 
 
 # Homepage
@@ -113,4 +155,19 @@ def toggle_task_status(task_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    print("\n" + "=" * 50)
+    print("🚀 Task Manager Application")
+    print("=" * 50)
+    print("📍 Server running at: http://localhost:5000")
+    print("📍 Press CTRL+C to stop the server")
+    print("=" * 50 + "\n")
+
+    try:
+        # Run with debug=False to avoid threading issues
+        app.run(debug=False, host="127.0.0.1", port=5000, use_reloader=False)
+    except KeyboardInterrupt:
+        print("\n🛑 Server stopped by user")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        sys.exit(1)

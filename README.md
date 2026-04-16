@@ -32,7 +32,9 @@ A simple task management web application built with Flask and MongoDB.
 2. **Create virtual environment**
     ```python
     python3 -m venv venv
-    source venv\Scripts\activate.bat
+    source venv\Scripts\activate    
+
+    # On Windows: venv\Scripts\activate.bat
     ```
 
 3. **Install dependencies**
