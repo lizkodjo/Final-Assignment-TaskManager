@@ -6,16 +6,16 @@ import sys
 
 from bson import ObjectId
 from flask import Flask, jsonify, render_template, request
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from pymongo import MongoClient
 
-load_dotenv()  # Get environment variable
+# load_dotenv()  # Get environment variable
 
 # Create a Flask instance with 'name' argument
 app = Flask(__name__)
 
 # Create MongoDB connection (localhost for this app)
-MONGO_URI = os.getenv("MONGO_URI", "MONGO_LOCAL")  # Environment variables
+MONGO_URI = os.environ.get("MONGO_URI", "MONGO_LOCAL")  # Environment variables
 client = MongoClient(MONGO_URI)
 
 # Create a databse and collection
