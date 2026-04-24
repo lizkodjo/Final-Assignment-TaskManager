@@ -1,40 +1,149 @@
-# Mini Project to Submit
+# Two tier deployment using an Auto Scaling Group (ASG)  with a Load Balancer (LB)
+
+## Task Manager App
+To explain how to build a two tier deployment, I created a simple task management application using Flask and MongoDB.
+
+**N-tier architecture** is a client-server software design which breaks the application into logical and physical separated tiers to improve scalability, maintainability and security. 
+
+In my project, I have divided the application into two, the Client tier (user interface and application logic)  and a Server tier (database).
+
+### Creating and Testing App
+I created my app and tested it locally.  I connected it to my MongoDB Atlas account to make sure the database is created and data was being stored correctly. 
+
+![Local Database Test](/images/DBConnection.png)
+
+After testing and confirming the database was created and data received correctly, I then started making changes to ensure I could deploy it on AWS.
+
+## 🗃️ Client Tier
+To create this tier, I logged into AWS and created an EC2 instance with the following:
+- ***EC2 Instance***:
+    - **AMI (Amazon Machine Image)**
+        - Ubuntu 22.04 LTS
+    - **Instance type**
+        - t3.micro (free tier)
+    - **Security Group Rules**
+        - SSH - 22 (My IP address so I can connect)
+        - HTTP - 80 (Web traffic (Nginx will use this))
+        - Custom TCP - 5000 (Flask access for testing)
+
+- ***Connect to EC2 Instance***:
+    ```bash
+    # Create key file and secure key
+    chmod 400 your-key.pem
+
+    # Connect (copy connection string from AWS)
+    ssh -i your-key.pem ubuntu@YOUR_EC2_PUBLIC_IP
+    ```
+
+- ***Update System***
+    ```bash
+    # Update packages
+    sudo apt update -y
+
+    # Upgrade packages
+    sudo apt upgrade -y
+    ```
+
+- ***Install Python, nginx and Git***
+    - *python3-pip* - Package manager for python
+    - *python3-venv* - Isolated Python environment
+    - *git* - Clone my code from GitHub
+    - *nginx* - Web Server
+    
+    ```bash
+    sudo apt install -y python3-pip python3-venv git nginx
+    ```
+
+- ***Configure nginx (Reverse Proxy)***
+    ```bash
+    cd /etc/nginx/sites-available
+
+    # Configure default document
+    sudo nano default
+    ![default](images/)(Add image)
+
+    # Forward dynamic request
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+    # Start nginx for changes to be registered
+    sudo systemctl start nginx -y
+    ```
+- ***Clone and Setup Application***
+    ```bash
+    # Clone my code
+    git clone https://github.com/lizkodjo/TaskManager.git
+    cd TaskManager
+    ```
+    ![Cloned folder](images/ClonedRepo.png) 
+
+    ```bash
+     # Create virtual environment
+     python3 -m venv venv
+
+     # Activate it
+     source venv/bin/activate
+
+     # Install dependencies
+     pip install -r requirements.txt
+     
+     ```
+    
+     
+
+
+## 🗄️ Server Tier
+
+To create this tier, I created another EC2 instance with the following:
+- ***EC2 Instance***:
+    - **AMI (Amazon Machine Image)**
+        - Ubuntu 22.04 LTS
+    - **Instance type**
+        - t3.micro (free tier)
+    - **Security Group Rules**
+        - SSH - 22 (My IP address so I can connect)
+        - Custom TCP - 27017 (MongoDB)
+
+- ***Connect, update and upgrade***
+
+
 
 - cd into folder
 - set environment variable  `export MONGO_URI="your_mongodb_connection_string"` (mongodb public ip address(export MONGO_URI=mongodb:publicIPaddress:27017)) set this on the app instance
+- update
+- upgrade
+
+## Database
+- Create instance, update and upgrade (check if curl is installed and aslo install gpg)
+- 
 
 
-Please complete a two tier deployment inside an ASG with an LB and document in a professional way. Host this on a GitHub Repo.
+    ```bash
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+   ```
 
-The deployment can be the Sparta app + MongoDB, or your own choice of software.
+```bash
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | \
+   sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
 
-Technical Requirements
-The deployment must:
-- Run on EC2 (AWS)
-- Must be 2-tier (frontend and database deployed on separate servers).
-- Automatically scale under load (ASG)
-- Provide an endpoint that balances traffic (LB)
-- Be observable (logs + metrics)
+#    Update
+sudo apt update -y
 
-Deliverables
-You should upload to the final project submission the following content:
-- A professional looking GitHub repo that contains:
-  - A welcome README.md file that outlines the project and it's goals
-  - Scripts to deploy the app and database
-  - A  guide showing how to deploy the app an database using a script, images and then       images + User data
-  - A guide showing how to move your automated deployment (image and user data) to an Autoscaling group
+# Install
+sudo apt install -y mongodb-org
 
-Extra notes/tips:
-  - The app should be autoscaled, the db can be static
-  - Showcase the setup of relevant cloudwatch alarms and notifications for bonus marks
-  - A dashboard showing the ASG metrics would be beneficial to have and will get you bonus marks
-  - Include screenshots!
-  - A diagram of the ASG architecture will get you more marks
-  - A file that include some explanation of the concepts/theory and the business value of ASGs will get you extra marks
-  - ASG Scaling policy = Min 2, Max 3 Desired 2
-  - Must be t3.micro (instance type)
-  - Must terminate everything once documentation is completed
+# Start
+sudo systemctl start mongod
+   ```
 
-Soft Deadline:
 
-2 weeks (Friday 24th of April)
+## Configure mongo
+
+`cd /` to get to root (cd /etc, mongoconf, change bindip, then restart)
+
+- printenv
+
+
+

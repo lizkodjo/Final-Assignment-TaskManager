@@ -1,4 +1,4 @@
-# Task Manager with MongoDB
+# Task Manager
 A simple task management web application built with Flask and MongoDB.
 
 ## Features
@@ -26,8 +26,8 @@ A simple task management web application built with Flask and MongoDB.
 ## Local Development Setup
 1. **Clone the repository**
     ```bash
-    git clone https://github.com/lizkodjo/Final-Assignment-TaskManager.git
-    cd Final-Assignment-TaskManager
+    git clone https://github.com/lizkodjo/TaskManager.git
+    cd TaskManager
     ```
 2. **Create virtual environment**
     ```python
