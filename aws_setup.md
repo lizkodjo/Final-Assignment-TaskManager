@@ -69,7 +69,6 @@ To create this tier, I logged into AWS and created an EC2 instance with the foll
 
   # Configure default document
   sudo nano default
-  ![default](images/)(Add image)
 
   # Forward dynamic request
   location / {
@@ -169,6 +168,8 @@ To create this tier, I created another EC2 instance with the following:
   sudo systemctl enable mongod
 
   ```
+
+  ![Mongod.conf](/images/MongoBindIP.png)
 
 - Get your database public ip address from AWS
 
